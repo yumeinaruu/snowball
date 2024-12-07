@@ -71,7 +71,7 @@ async def start_type_chosen(message: types.Message, state: FSMContext):
             text="do u suck?",
             reply_markup=make_row_keyboard(['да', 'нет'])
         )
-        await state.set_state(Register.choosing_chat_options)
+        await state.set_state(Register.choosing_user_options)
 
 
 @snowball_router.message(Register.choosing_register)

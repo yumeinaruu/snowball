@@ -10,3 +10,4 @@ def make_row_keyboard(items: list[str]) -> ReplyKeyboardMarkup:
 class Register(StatesGroup):
     choosing_register = State()
     choosing_chat_options = State()
+    choosing_user_options = State()
