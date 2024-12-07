@@ -9,7 +9,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from src.models import Users
 from src.utils.db import session
 from src.snowball.handlers_fcm.steps import available_type_choices, available_chat_choices
-from .fsm import make_row_keyboard, Register
+from .fsm import make_row_keyboard, Register, UserCallbackFactory
 from .routers import snowball_router
 
 
@@ -99,8 +99,7 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
         msg = "Пользователи:"
         builder = InlineKeyboardBuilder()
         for user in users:
-            builder.row(InlineKeyboardButton(text=f"{user.role}",
-                                             callback_data="user_chosen"))
+            builder.button(text=f"{user.role}", callback_data=UserCallbackFactory(telegram_id=user.tg_id))
 
         await message.answer(
             text=msg,
@@ -140,10 +139,10 @@ async def choosing_role(message: types.Message, state: FSMContext):
     await state.set_data({})
 
 
-@snowball_router.callback_query(Register.choosing_receiver, F.data == "user_chosen")
-async def chat_choose_receiver(callback: types.CallbackQuery, state: FSMContext):
+@snowball_router.callback_query(Register.choosing_receiver, UserCallbackFactory.filter())
+async def chat_choose_receiver(callback: types.CallbackQuery, callback_data: UserCallbackFactory, state: FSMContext):
     await callback.message.answer("Напиши пожелание для участника) ")
-
+    await callback.message.answer(str(callback_data.telegram_id))
     await state.clear()
     await state.set_data({})
 

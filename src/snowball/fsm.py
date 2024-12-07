@@ -1,6 +1,6 @@
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-
+from aiogram.filters.callback_data import CallbackData
 
 def make_row_keyboard(items: list[str]) -> ReplyKeyboardMarkup:
     row = [KeyboardButton(text=item) for item in items]
@@ -14,3 +14,7 @@ class Register(StatesGroup):
     choosing_role = State()
     choosing_receiver = State()
     choosing_message = State()
+
+
+class UserCallbackFactory(CallbackData, prefix="user"):
+    telegram_id: int
