@@ -3,7 +3,7 @@ from aiogram import types, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import ReplyKeyboardRemove
+from aiogram.types import ReplyKeyboardRemove, KeyboardButton
 from src.models import Users
 from src.utils.db import session
 from src.snowball.handlers_fcm.steps import available_type_choices, available_chat_choices
@@ -92,6 +92,15 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
         )
         await state.update_data({"chat": message.text.capitalize()})
         await state.set_state(Register.choosing_receiver)
+
+        users = session.query(Users).filter_by(chat=(await state.get_data())["chat"]).all()
+        msg = "Пользователи:"
+        users_list = []
+        for user in users:
+            users_list.append([KeyboardButton(text=f"{user.role}")])
+        await message.answer(
+            text=msg,
+        )
     if (await state.get_data())["chosen_start_type"] == "регистрация":
         await message.answer(
             text=f"Ты выбрал чат {message.text.lower()}.\n"
@@ -128,14 +137,6 @@ async def choosing_role(message: types.Message, state: FSMContext):
 
 @snowball_router.message(Register.choosing_receiver)
 async def chat_choose_receiver(message: types.Message, state: FSMContext):
-    # users = session.query(Users).filter_by(chat=(await state.get_data())["chat"]).all()
-    # msg = "Пользователи: \n"
-    # for user in users:
-    #     msg += f"{user.role}\n"
-    msg = "huis"
-    await message.answer(
-        text=msg
-    )
 
     await state.clear()
     await state.set_data({})
