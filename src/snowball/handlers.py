@@ -82,7 +82,7 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
              f"Теперь напиши свою роль",
         reply_markup=ReplyKeyboardRemove()
     )
-    await state.set_data({"role": message.text.capitalize()})
+    await state.set_data({"chat": message.text.capitalize()})
     await state.set_state(Register.choosing_role)
 
 
