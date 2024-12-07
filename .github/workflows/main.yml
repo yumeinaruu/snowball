@@ -19,7 +19,7 @@ jobs:
       - name: Deploy to Droplet
         run: |
           sshpass -p "${{ secrets.DO_SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_SSH_USER }}@${{ secrets.DO_SSH_HOST }} << 'EOF'
-          cd /snowball
+          cd snowball/
           git pull origin main
           docker compose down
           docker compose up -d --build
