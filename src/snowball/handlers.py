@@ -51,17 +51,25 @@ async def register(
 async def start_type_chosen(message: types.Message, state: FSMContext):
     await state.update_data(chosen_start_type=message.text.lower())
     if message.text.lower() == "регистрация":
-        await message.answer(
-            text="Теперь выбери название чата:",
-            reply_markup=make_row_keyboard(available_chat_choices)
-        )
-        await state.set_state(Register.choosing_chat_options)
+        user = Users.get_user_by_tg_id(message.from_user.id)
+        if user:
+            await message.answer("Ты уже зареган(")
+        else:
+            await message.answer(
+                text="Теперь выбери название чата:",
+                reply_markup=make_row_keyboard(available_chat_choices)
+            )
+            await state.set_state(Register.choosing_chat_options)
     elif message.text.lower() == "отправка сообщения":
-        await message.answer(
-            text="do u suck?",
-            reply_markup=make_row_keyboard(['да', 'да'])
-        )
-        await state.set_state(Register.choosing_user_options)
+        user = Users.get_user_by_tg_id(message.from_user.id)
+        if user:
+            await message.answer(
+                text="do u suck?",
+                reply_markup=make_row_keyboard(['да', 'да'])
+            )
+            await state.set_state(Register.choosing_user_options)
+        else:
+            await message.answer("Ты еще не зареган(")
 
 
 @snowball_router.message(Register.choosing_register)
@@ -87,17 +95,6 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
     await state.set_state(Register.choosing_role)
 
 
-@snowball_router.message(Register.choosing_role)
-async def choosing_role(message: types.Message, state: FSMContext):
-    await state.update_data({"role": message.text.capitalize()})
-    data = await state.get_data()
-    user = Users(tg_id=message.from_user.id, role=data["role"], chat=data["chat"])
-    session.add(user)
-    session.commit()
-    await message.answer(f"{data["role"]} юпиё!")
-    await state.clear()
-
-
 @snowball_router.message(Register.choosing_chat_options)
 async def choice_incorrect_chat(message: types.Message):
     await message.answer_sticker(
@@ -110,21 +107,24 @@ async def choice_incorrect_chat(message: types.Message):
     )
 
 
+@snowball_router.message(Register.choosing_role)
+async def choosing_role(message: types.Message, state: FSMContext):
+    await state.update_data({"role": message.text.capitalize()})
+    data = await state.get_data()
+    user = Users(tg_id=message.from_user.id, role=data["role"], chat=data["chat"])
+    session.add(user)
+    session.commit()
+    await message.answer(f"{data["role"]} юпиё!")
+    await state.clear()
+
+
 @snowball_router.message(Command("me"))
 async def me(message: types.Message):
     user = Users.get_user_by_tg_id(tg_id=message.from_user.id)
     if user:
-        await message.answer(f"Твоя роль {user.role}\n Твой чат: {user.chat}")
+        await message.answer(f"Твоя роль {user.role}\nТвой чат: {user.chat}")
     else:
         await message.answer("Ты не зареган")
-
-
-
-@snowball_router.message(Command("send"))
-async def send(
-        message: types.Message
-):
-    await message.answer(str(message.from_user))
 
 
 @snowball_router.message()
