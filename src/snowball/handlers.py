@@ -1,6 +1,7 @@
 from aiogram import types, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
+from aiogram.types import ReplyKeyboardRemove
 
 from src.snowball.handlers_fcm.steps import available_type_choices, available_chat_choices
 from .fsm import make_row_keyboard, Register
@@ -61,6 +62,29 @@ async def choice_incorrect(message: types.Message):
         text="Нет такой опции(.\n\n"
              "Выбери одну из списка ниже:",
         reply_markup=make_row_keyboard(available_type_choices)
+    )
+
+
+@snowball_router.message(Register.choosing_chat_options, F.text.in_(available_chat_choices))
+async def food_size_chosen(message: types.Message, state: FSMContext):
+    user_data = await state.get_data()
+    await message.answer(
+        text=f"Вы выбрали чат {message.text.lower()}.\n"
+             f"Теперь напишите свою роль",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    await state.clear()
+
+
+@snowball_router.message(Register.choosing_chat_options)
+async def choice_incorrect_chat(message: types.Message):
+    await message.answer_sticker(
+        r'CAACAgIAAxkBAAEKu_hnVFXyusZgy9KLwB7A3Z7cDqt1DgACEiAAAmd5uUhgfmY8HebIQDYE'
+    )
+    await message.answer(
+        text="Нет такого чата(.\n\n"
+             "Выбери один из списка ниже:",
+        reply_markup=make_row_keyboard(available_chat_choices)
     )
 
 
