@@ -60,7 +60,7 @@ async def choice_incorrect(message: types.Message):
     await message.answer(
         text="Нет такой опции(.\n\n"
              "Выбери одну из списка ниже:",
-        reply_markup=make_row_keyboard(available_chat_choices)
+        reply_markup=make_row_keyboard(available_type_choices)
     )
 
 
