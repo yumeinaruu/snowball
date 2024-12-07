@@ -3,7 +3,7 @@ from aiogram import types, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import ReplyKeyboardRemove, KeyboardButton
+from aiogram.types import ReplyKeyboardRemove, InlineKeyboardButton
 from src.models import Users
 from src.utils.db import session
 from src.snowball.handlers_fcm.steps import available_type_choices, available_chat_choices
@@ -97,7 +97,7 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
         msg = "Пользователи:"
         users_list = []
         for user in users:
-            users_list.append([KeyboardButton(text=f"{user.role}")])
+            users_list.append([InlineKeyboardButton(text=f"{user.role}")])
         await message.answer(
             text=msg,
         )
