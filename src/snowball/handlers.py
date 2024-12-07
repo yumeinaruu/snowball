@@ -25,7 +25,7 @@ async def register(
         state: FSMContext
 ):
     await message.answer(
-        text="Выберите блюдо:",
+        text="Что вы хотите сделать?",
         reply_markup=make_row_keyboard(available_type_choices)
     )
     await state.set_state(Register.choosing_register)
