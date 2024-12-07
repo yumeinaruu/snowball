@@ -1,14 +1,22 @@
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from src.utils.db import Base
+from src.utils.db import Base, session
 
 
 class Users(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    tg_id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(unique=True, nullable=False)
+    tg_id: Mapped[int] = mapped_column(nullable=False)
+    role: Mapped[str] = mapped_column(nullable=False)
+    chat: Mapped[str] = mapped_column(nullable=False)
     messages: Mapped["Messages"] = relationship(back_populates="user")
+
+    def __repr__(self):
+        return f"User({self.role})"
+
+    @staticmethod
+    def get_user_by_tg_id(tg_id):
+        return session.query(Users).filter_by(tg_id=tg_id).first()
 
 
 class Messages(Base):
@@ -16,5 +24,8 @@ class Messages(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     text: Mapped[int] = mapped_column()
-    to_user_id: Mapped["Users"] = relationship()
-    user_id: Mapped["Users"] = relationship()
+    to_user: Mapped["Users"] = relationship()
+    from_user: Mapped["Users"] = relationship()
+
+    def __repr__(self):
+        return f"Message({self.from_user.role})"

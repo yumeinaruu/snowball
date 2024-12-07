@@ -21,4 +21,5 @@ session = create_session(bind=engine)
 
 def create_tables():
     from src.models import Users, Messages
+    # Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
