@@ -8,5 +8,5 @@ def make_row_keyboard(items: list[str]) -> ReplyKeyboardMarkup:
 
 
 class Register(StatesGroup):
-    choosing_food_name = State()
+    choosing_register = State()
     choosing_food_size = State()

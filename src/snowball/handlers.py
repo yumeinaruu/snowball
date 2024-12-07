@@ -1,5 +1,9 @@
 from aiogram import types
-from aiogram.filters import Command
+from aiogram.filters import Command, StateFilter
+from aiogram.fsm.context import FSMContext
+
+from src.snowball.handlers.steps import available_type_choices
+from .fsm import make_row_keyboard, Register
 from .routers import snowball_router
 import logging
 
@@ -14,11 +18,18 @@ async def start(
     await message.answer(msg)
 
 
-@snowball_router.message(Command("register"))
+# @snowball_router.message(Command("register"))
+@snowball_router.message(StateFilter(None), Command("register"))
 async def register(
-        message: types.Message
+        message: types.Message,
+        state: FSMContext
 ):
-    await message.answer(str(message.from_user))
+    await message.answer(
+        text="Выберите блюдо:",
+        reply_markup=make_row_keyboard(available_type_choices)
+    )
+    await state.set_state(Register.choosing_register)
+    # await message.answer(str(message.from_user))
 
 
 @snowball_router.message(Command("send"))
