@@ -8,18 +8,18 @@ from .routers import snowball_router
 import logging
 
 
-@snowball_router.message(Command("start"))
-async def start(
-        message: types.Message
-):
-    msg = """
-    Сосал?
-    """
-    await message.answer(msg)
+# @snowball_router.message(Command("start"))
+# async def start(
+#         message: types.Message
+# ):
+#     msg = """
+#     Сосал?
+#     """
+#     await message.answer(msg)
 
 
 # @snowball_router.message(Command("register"))
-@snowball_router.message(StateFilter(None), Command("register"))
+@snowball_router.message(StateFilter(None), Command("start"))
 async def register(
         message: types.Message,
         state: FSMContext
