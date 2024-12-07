@@ -103,7 +103,7 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
 
         await message.answer(
             text=msg,
-            reply_markup=builder.as_markup()
+            reply_markup=builder.adjust(5).as_markup()
         )
     if (await state.get_data())["chosen_start_type"] == "регистрация":
         await message.answer(
