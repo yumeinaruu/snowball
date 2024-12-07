@@ -99,7 +99,8 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
         msg = "Пользователи:"
         builder = InlineKeyboardBuilder()
         for user in users:
-            builder.row(InlineKeyboardButton(text=f"{user.role}"))
+            builder.row(InlineKeyboardButton(text=f"{user.role}",
+                                             callback_data="user_chosen"))
 
         await message.answer(
             text=msg,
@@ -139,11 +140,21 @@ async def choosing_role(message: types.Message, state: FSMContext):
     await state.set_data({})
 
 
-@snowball_router.message(Register.choosing_receiver)
+@snowball_router.callback_query(Register.choosing_receiver, F.data == "user_chosen")
 async def chat_choose_receiver(message: types.Message, state: FSMContext):
-
+    await message.answer("HUI")
     await state.clear()
     await state.set_data({})
+
+
+@snowball_router.callback_query(Register.choosing_receiver, F.data == "prev_page_users")
+async def chat_choose_receiver(message: types.Message, state: FSMContext):
+    await message.answer("HUI")
+
+
+@snowball_router.callback_query(Register.choosing_receiver, F.data == "next_page_users")
+async def chat_choose_receiver(message: types.Message, state: FSMContext):
+    await message.answer("HUI")
 
 
 @snowball_router.message(Command("me"))
