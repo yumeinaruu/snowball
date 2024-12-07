@@ -22,6 +22,7 @@ jobs:
           cd snowball/
           git pull origin main
           docker compose down
-          docker compose up -d --build
+          docker compose up -d --build snowball_bot
+          docker compose up -d db_postgres_snowball_bot
           docker exec snowball_bot python3 create_tables.py
           EOF
