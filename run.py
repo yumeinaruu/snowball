@@ -2,7 +2,7 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from src.settings import settings
-from src.snowball.handlers_fcm import snowball_router
+from src.snowball.handlers import snowball_router
 
 
 logging.basicConfig(level=logging.INFO)
