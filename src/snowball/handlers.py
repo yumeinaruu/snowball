@@ -10,15 +10,6 @@ from .routers import snowball_router
 import logging
 
 
-# @snowball_router.message(Command("start"))
-# async def start(
-#         message: types.Message
-# ):
-#     msg = """
-#     Сосал?
-#     """
-#     await message.answer(msg)
-
 
 @snowball_router.message(StateFilter(None), Command(commands=["cancel"]))
 @snowball_router.message(default_state, F.text.lower() == "отмена")
@@ -40,7 +31,6 @@ async def cmd_cancel(message: types.Message, state: FSMContext):
     )
 
 
-# @snowball_router.message(Command("register"))
 @snowball_router.message(StateFilter(None), Command("start"))
 async def register(
         message: types.Message,
@@ -51,7 +41,6 @@ async def register(
         reply_markup=make_row_keyboard(available_type_choices)
     )
     await state.set_state(Register.choosing_register)
-    # await message.answer(str(message.from_user))
 
 
 @snowball_router.message(
@@ -69,7 +58,7 @@ async def start_type_chosen(message: types.Message, state: FSMContext):
     elif message.text.lower() == "отправка сообщения":
         await message.answer(
             text="do u suck?",
-            reply_markup=make_row_keyboard(['да', 'нет'])
+            reply_markup=make_row_keyboard(['да', 'да'])
         )
         await state.set_state(Register.choosing_user_options)
 
@@ -93,6 +82,12 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
              f"Теперь напиши свою роль",
         reply_markup=ReplyKeyboardRemove()
     )
+    await state.set_state(Register.choosing_role)
+
+
+@snowball_router.message(Register.choosing_role)
+async def choosing_role(message: types.Message, state: FSMContext):
+    await message.answer(str(state))
     await state.clear()
 
 
