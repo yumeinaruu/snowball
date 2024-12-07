@@ -8,6 +8,7 @@ async def start(
         message: types.Message
 ):
     msg = """
+    Сосал?
     """
     await message.answer(msg)
 
