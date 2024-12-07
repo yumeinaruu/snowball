@@ -1,13 +1,14 @@
+import logging
 from aiogram import types, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import ReplyKeyboardRemove
-
+from src.models import Users
+from src.utils.db import session
 from src.snowball.handlers_fcm.steps import available_type_choices, available_chat_choices
 from .fsm import make_row_keyboard, Register
 from .routers import snowball_router
-import logging
 
 
 
@@ -89,7 +90,11 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
 @snowball_router.message(Register.choosing_role)
 async def choosing_role(message: types.Message, state: FSMContext):
     await state.update_data({"role": message.text.capitalize()})
-    await message.answer(str(await state.get_data()))
+    data = await state.get_data()
+    user = Users(tg_id=message.from_user.id, role=data["role"], chat=data["chat"])
+    session.add(user)
+    session.commit()
+    await message.answer(f"{data["name"]} юпиё!")
     await state.clear()
 
 
@@ -103,6 +108,16 @@ async def choice_incorrect_chat(message: types.Message):
              "Выбери один из списка ниже:",
         reply_markup=make_row_keyboard(available_chat_choices)
     )
+
+
+@snowball_router.message(Command("me"))
+async def me(message: types.Message):
+    user = Users.get_user_by_tg_id(tg_id=message.from_user.id)
+    if user:
+        await message.answer(f"Твоя роль {user.role}\n Твой чат: {user.chat}")
+    else:
+        await message.answer("Ты не зареган")
+
 
 
 @snowball_router.message(Command("send"))
