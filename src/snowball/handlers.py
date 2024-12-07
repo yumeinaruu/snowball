@@ -6,7 +6,7 @@ from aiogram.fsm.state import default_state
 from aiogram.types import ReplyKeyboardRemove, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.models import Users
+from src.models import Users, Messages
 from src.utils.db import session
 from src.snowball.handlers_fcm.steps import available_type_choices, available_chat_choices
 from .fsm import make_row_keyboard, Register, UserCallbackFactory
@@ -142,14 +142,25 @@ async def choosing_role(message: types.Message, state: FSMContext):
 @snowball_router.callback_query(Register.choosing_receiver, UserCallbackFactory.filter())
 async def chat_choose_receiver(callback: types.CallbackQuery, callback_data: UserCallbackFactory, state: FSMContext):
     await callback.message.answer("Напиши пожелание для участника) ")
-    await callback.message.answer(str(callback_data.telegram_id))
-    await state.clear()
-    await state.set_data({})
+    await state.update_data({"to_user": callback_data.telegram_id})
+    await state.set_state(Register.choosing_message)
 
 
 @snowball_router.callback_query(StateFilter(None), F.data == "user_chosen")
 async def chat_choose_receiver_without_state(message: types.Message):
     await message.answer("Жулик, не делай так.")
+
+
+@snowball_router.callback_query(Register.choosing_message, UserCallbackFactory.filter())
+async def chat_choose_receiver(message: types.Message, state: FSMContext):
+    to_user_obj = Users.get_user_by_tg_id((await state.get_data())["to_user"])
+    msg = Messages(text=message.text, from_user=Users.get_user_by_tg_id(message.from_user.id),
+                   to_user=to_user_obj)
+    session.add(msg)
+    session.commit()
+    await message.answer(f"Юпиёёёёё!\nСообщение отправлено участнику {to_user_obj.role} из {to_user_obj.chat}")
+    await state.clear()
+    await state.set_data({})
 
 
 @snowball_router.callback_query(Register.choosing_receiver, F.data == "prev_page_users")
