@@ -59,9 +59,9 @@ async def send(
     await message.answer(str(message.from_user))
 
 
-# @snowball_router.message()
-# async def all_messages(
-#         message: types.Message
-# ):
-#     logging.info(message.text)
-#     await message.answer("Ну ты и уёба")
+@snowball_router.message()
+async def all_messages(
+        message: types.Message
+):
+    logging.info(message.text)
+    # await message.answer("Ну ты и уёба")
