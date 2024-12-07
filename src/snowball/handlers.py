@@ -4,6 +4,8 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import ReplyKeyboardRemove, InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 from src.models import Users
 from src.utils.db import session
 from src.snowball.handlers_fcm.steps import available_type_choices, available_chat_choices
@@ -95,11 +97,13 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
 
         users = session.query(Users).filter_by(chat=(await state.get_data())["chat"]).all()
         msg = "Пользователи:"
-        users_list = []
+        builder = InlineKeyboardBuilder()
         for user in users:
-            users_list.append([InlineKeyboardButton(text=f"{user.role}")])
+            builder.row(InlineKeyboardButton(text=f"{user.role}"))
+
         await message.answer(
             text=msg,
+            reply_markup=builder.as_markup()
         )
     if (await state.get_data())["chosen_start_type"] == "регистрация":
         await message.answer(
