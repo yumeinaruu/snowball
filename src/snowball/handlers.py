@@ -94,7 +94,7 @@ async def choosing_role(message: types.Message, state: FSMContext):
     user = Users(tg_id=message.from_user.id, role=data["role"], chat=data["chat"])
     session.add(user)
     session.commit()
-    await message.answer(f"{data["name"]} юпиё!")
+    await message.answer(f"{data["role"]} юпиё!")
     await state.clear()
 
 
