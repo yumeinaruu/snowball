@@ -31,8 +31,8 @@ async def cmd_cancel(message: types.Message, state: FSMContext):
     )
 
 
-@snowball_router.message(StateFilter(None), Command("start"))
-async def start(
+@snowball_router.message(StateFilter(None), Command(commands=["start", "menu"]))
+async def menu(
         message: types.Message,
         state: FSMContext
 ):
@@ -62,7 +62,7 @@ async def start_type_chosen(message: types.Message, state: FSMContext):
     elif message.text.lower() == "отправка сообщения":
         user = Users.get_user_by_tg_id(message.from_user.id)
         if user:
-            users = session.query(Users).all()
+            users = session.query(Users).filter_by(chat=user.chat).all()
             msg = "Пользователи: \n"
             for user in users:
                 msg += f"{user.role}\n"
