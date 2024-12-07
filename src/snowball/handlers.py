@@ -52,6 +52,18 @@ async def start_type_chosen(message: types.Message, state: FSMContext):
         await state.set_state(Register.choosing_chat_options)
 
 
+@snowball_router.message(Register.choosing_register)
+async def choice_incorrect(message: types.Message):
+    await message.answer_sticker(
+        r'CAACAgIAAxkBAAEKu_hnVFXyusZgy9KLwB7A3Z7cDqt1DgACEiAAAmd5uUhgfmY8HebIQDYE'
+    )
+    await message.answer(
+        text="Нет такой опции(.\n\n"
+             "Выбери одну из списка ниже:",
+        reply_markup=make_row_keyboard(available_chat_choices)
+    )
+
+
 @snowball_router.message(Command("send"))
 async def send(
         message: types.Message
