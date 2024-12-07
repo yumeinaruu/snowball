@@ -12,3 +12,4 @@ class Register(StatesGroup):
     choosing_chat_options = State()
     choosing_user_options = State()
     choosing_role = State()
+    choosing_receiver = State()
