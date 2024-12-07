@@ -1,5 +1,5 @@
-POSTGRES_USER=your_username     
-POSTGRES_PASSWORD=your_password
-POSTGRES_DB=your_database_name
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=root
+POSTGRES_DB=snowball_db
 PGHOST=postgres
 PGPORT=5432
