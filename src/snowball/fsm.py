@@ -13,3 +13,4 @@ class Register(StatesGroup):
     choosing_user_options = State()
     choosing_role = State()
     choosing_receiver = State()
+    choosing_message = State()

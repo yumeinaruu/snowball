@@ -141,10 +141,16 @@ async def choosing_role(message: types.Message, state: FSMContext):
 
 
 @snowball_router.callback_query(Register.choosing_receiver, F.data == "user_chosen")
-async def chat_choose_receiver(message: types.Message, state: FSMContext):
-    await message.answer("HUI")
+async def chat_choose_receiver(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer("Напиши пожелание для участника) ")
+
     await state.clear()
     await state.set_data({})
+
+
+@snowball_router.callback_query(StateFilter(None), F.data == "user_chosen")
+async def chat_choose_receiver_without_state(message: types.Message):
+    await message.answer("Жулик, не делай так.")
 
 
 @snowball_router.callback_query(Register.choosing_receiver, F.data == "prev_page_users")
