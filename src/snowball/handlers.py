@@ -87,7 +87,7 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
     if (await state.get_data())["chosen_start_type"] == "отправка сообщения":
         await message.answer(
             text=f"Ты выбрал чат {message.text.lower()}.\n"
-                 f"Теперь напиши свою роль",
+                 f"Теперь выбери пользователя",
             reply_markup=ReplyKeyboardRemove()
         )
         await state.update_data({"chat": message.text.capitalize()})
