@@ -13,7 +13,7 @@ async def main():
         while True:
             bot = Bot(token=settings.BOT_TOKEN)
             try:
-                await bot.send_message(chat_id=message.to_user, text=msg)
+                await bot.send_message(chat_id=message.to_user.tg_id, text=msg)
             except Exception as e:
                 print(f"{e}:  :(    ")
             finally:
