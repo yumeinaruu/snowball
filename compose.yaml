@@ -7,13 +7,13 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=snowball_bot
   bot:
     build: .
     container_name: snowball_bot
-    command: python ./run.py
+    command: python ./run.py --create_db
     volumes:
       - .:/app
     env_file:
