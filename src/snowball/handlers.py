@@ -152,7 +152,7 @@ async def chat_choose_receiver_without_state(message: types.Message):
 
 
 @snowball_router.callback_query(Register.choosing_message, UserCallbackFactory.filter())
-async def chat_choose_receiver(message: types.Message, state: FSMContext):
+async def chat_choosing_message(message: types.Message, state: FSMContext):
     to_user_obj = Users.get_user_by_tg_id((await state.get_data())["to_user"])
     msg = Messages(text=message.text, from_user=Users.get_user_by_tg_id(message.from_user.id),
                    to_user=to_user_obj)
