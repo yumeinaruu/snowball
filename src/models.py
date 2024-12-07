@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from src.utils.db import Base, session
 
@@ -9,7 +11,7 @@ class Users(Base):
     tg_id: Mapped[int] = mapped_column(nullable=False)
     role: Mapped[str] = mapped_column(nullable=False)
     chat: Mapped[str] = mapped_column(nullable=False)
-    messages: Mapped["Messages"] = relationship(back_populates="user")
+    messages: Mapped[List["Messages"]] = relationship(back_populates="user")
 
     def __repr__(self):
         return f"User({self.role})"
@@ -24,8 +26,8 @@ class Messages(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     text: Mapped[int] = mapped_column()
-    to_user: Mapped["Users"] = relationship()
-    from_user: Mapped["Users"] = relationship()
+    to_user: Mapped["Users"] = relationship(back_populates="messages")
+    from_user: Mapped["Users"] = relationship(back_populates="messages")
 
     def __repr__(self):
         return f"Message({self.from_user.role})"
