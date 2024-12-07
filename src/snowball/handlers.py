@@ -20,6 +20,26 @@ import logging
 #     await message.answer(msg)
 
 
+@snowball_router.message(StateFilter(None), Command(commands=["cancel"]))
+@snowball_router.message(default_state, F.text.lower() == "отмена")
+async def cmd_cancel_no_state(message: types.Message, state: FSMContext):
+    await state.set_data({})
+    await message.answer(
+        text="Нечего отменять",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+
+@snowball_router.message(Command(commands=["cancel"]))
+@snowball_router.message(F.text.lower() == "отмена")
+async def cmd_cancel(message: types.Message, state: FSMContext):
+    await state.clear()
+    await message.answer(
+        text="Действие отменено",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+
 # @snowball_router.message(Command("register"))
 @snowball_router.message(StateFilter(None), Command("start"))
 async def register(
@@ -101,23 +121,3 @@ async def all_messages(
 ):
     logging.info(message.text)
     # await message.answer("Ну ты и уёба")
-
-
-@snowball_router.message(StateFilter(None), Command(commands=["cancel"]))
-@snowball_router.message(default_state, F.text.lower() == "отмена")
-async def cmd_cancel_no_state(message: types.Message, state: FSMContext):
-    await state.set_data({})
-    await message.answer(
-        text="Нечего отменять",
-        reply_markup=ReplyKeyboardRemove()
-    )
-
-
-@snowball_router.message(Command(commands=["cancel"]))
-@snowball_router.message(F.text.lower() == "отмена")
-async def cmd_cancel(message: types.Message, state: FSMContext):
-    await state.clear()
-    await message.answer(
-        text="Действие отменено",
-        reply_markup=ReplyKeyboardRemove()
-    )
