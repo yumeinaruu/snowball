@@ -22,8 +22,7 @@ async def cmd_cancel_no_state(message: types.Message, state: FSMContext):
     )
 
 
-@snowball_router.message(Command(commands=["cancel"]))
-@snowball_router.message(F.text.lower() == "отмена")
+@snowball_router.message(Command(commands=["cancel"]) or F.text.lower() == "отмена")
 async def cmd_cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
@@ -33,7 +32,7 @@ async def cmd_cancel(message: types.Message, state: FSMContext):
 
 
 @snowball_router.message(StateFilter(None), Command("start"))
-async def register(
+async def start(
         message: types.Message,
         state: FSMContext
 ):
@@ -131,5 +130,4 @@ async def me(message: types.Message):
 async def all_messages(
         message: types.Message
 ):
-    logging.info(message.text)
-    # await message.answer("Ну ты и уёба")
+    logging.info(f"{message.from_user.first_name}(@{message.from_user.username}): {message.text}")
