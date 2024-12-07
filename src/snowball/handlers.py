@@ -62,8 +62,13 @@ async def start_type_chosen(message: types.Message, state: FSMContext):
     elif message.text.lower() == "отправка сообщения":
         user = Users.get_user_by_tg_id(message.from_user.id)
         if user:
+            users = session.query(Users).all()
+            msg = "Пользователи: \n"
+            for user in users:
+                msg += f"{user.role}\n"
+
             await message.answer(
-                text="do u suck?",
+                text=msg,
                 reply_markup=make_row_keyboard(['да', 'да'])
             )
             await state.set_state(Register.choosing_user_options)
@@ -115,13 +120,14 @@ async def choosing_role(message: types.Message, state: FSMContext):
     session.commit()
     await message.answer(f"{data["role"]} юпиё!")
     await state.clear()
+    await state.set_data({})
 
 
 @snowball_router.message(Command("me"))
 async def me(message: types.Message):
     user = Users.get_user_by_tg_id(tg_id=message.from_user.id)
     if user:
-        await message.answer(f"Твоя роль {user.role}\nТвой чат: {user.chat}")
+        await message.answer(f"Ты {user.role}\nИ твой чат {user.chat}")
     else:
         await message.answer("Ты не зареган")
 
