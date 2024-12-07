@@ -82,13 +82,13 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
              f"Теперь напиши свою роль",
         reply_markup=ReplyKeyboardRemove()
     )
-    await state.set_data({"chat": message.text.capitalize()})
+    await state.update_data({"chat": message.text.capitalize()})
     await state.set_state(Register.choosing_role)
 
 
 @snowball_router.message(Register.choosing_role)
 async def choosing_role(message: types.Message, state: FSMContext):
-    await state.set_data({"role": message.text.capitalize()})
+    await state.update_data({"role": message.text.capitalize()})
     await message.answer(str(await state.get_data()))
     await state.clear()
 
