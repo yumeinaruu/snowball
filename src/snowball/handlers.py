@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 
-from src.snowball.handlers.steps import available_type_choices
+from src.snowball.handlers_fcm.steps import available_type_choices
 from .fsm import make_row_keyboard, Register
 from .routers import snowball_router
 import logging
