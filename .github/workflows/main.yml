@@ -23,6 +23,5 @@ jobs:
           git pull origin main
           docker compose down
           docker compose up -d --build
-          docker exec -it snowball_bot bash
-          python3 create_tables.py
+          docker exec snowball_bot python3 create_tables.py
           EOF
