@@ -1,8 +1,8 @@
-from aiogram import types
+from aiogram import types, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 
-from src.snowball.handlers_fcm.steps import available_type_choices
+from src.snowball.handlers_fcm.steps import available_type_choices, available_chat_choices
 from .fsm import make_row_keyboard, Register
 from .routers import snowball_router
 import logging
@@ -32,6 +32,26 @@ async def register(
     # await message.answer(str(message.from_user))
 
 
+@snowball_router.message(
+    Register.choosing_register,
+    F.text.in_(available_type_choices)
+)
+async def start_type_chosen(message: types.Message, state: FSMContext):
+    await state.update_data(chosen_start_type=message.text.lower())
+    if message.text.lower() == "регистрация":
+        await message.answer(
+            text="Теперь выбери название чата:",
+            reply_markup=make_row_keyboard(available_chat_choices)
+        )
+        await state.set_state(Register.choosing_chat_options)
+    elif message.text.lower() == "отправка сообщения":
+        await message.answer(
+            text="do u suck?",
+            reply_markup=make_row_keyboard(['да', 'нет'])
+        )
+        await state.set_state(Register.choosing_chat_options)
+
+
 @snowball_router.message(Command("send"))
 async def send(
         message: types.Message
@@ -39,9 +59,9 @@ async def send(
     await message.answer(str(message.from_user))
 
 
-@snowball_router.message()
-async def all_messages(
-        message: types.Message
-):
-    logging.info(message.text)
-    await message.answer("Ну ты и уёба")
+# @snowball_router.message()
+# async def all_messages(
+#         message: types.Message
+# ):
+#     logging.info(message.text)
+#     await message.answer("Ну ты и уёба")
