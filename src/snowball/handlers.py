@@ -128,11 +128,11 @@ async def choosing_role(message: types.Message, state: FSMContext):
 
 @snowball_router.message(Register.choosing_receiver)
 async def chat_choose_receiver(message: types.Message, state: FSMContext):
-    users = session.query(Users).filter_by(chat=(await state.get_data())["chat"]).all()
-    msg = "Пользователи: \n"
-    for user in users:
-        msg += f"{user.role}\n"
-
+    # users = session.query(Users).filter_by(chat=(await state.get_data())["chat"]).all()
+    # msg = "Пользователи: \n"
+    # for user in users:
+    #     msg += f"{user.role}\n"
+    msg = "huis"
     await message.answer(
         text=msg
     )
