@@ -67,7 +67,7 @@ async def choice_incorrect(message: types.Message):
 
 
 @snowball_router.message(Register.choosing_chat_options, F.text.in_(available_chat_choices))
-async def food_size_chosen(message: types.Message, state: FSMContext):
+async def chat_type_chosen(message: types.Message, state: FSMContext):
     await message.answer(
         text=f"Ты выбрал чат {message.text.lower()}.\n"
              f"Теперь напиши свою роль",
