@@ -7,11 +7,11 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     env_file:
-      - ./.dbenvironment
+      - .dbenvironment
   bot:
     build: .
     container_name: snowball_bot
-    command: python ./run.py
+    command: python ./run.py --create_db
     volumes:
       - .:/app
     env_file:
