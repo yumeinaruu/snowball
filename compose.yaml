@@ -1,15 +1,20 @@
+networks:
+  snowball:
+    name: snowball
+    external: true
+
 services:
   postgres_db:
     image: postgres:latest
     container_name: db_postgres_snowball_bot
-    ports:
-      - "5432:5432"
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=snowball_bot
+    networks:
+      - snowball
   bot:
     build: .
     container_name: snowball_bot
@@ -18,5 +23,7 @@ services:
       - .:/app
     env_file:
       - .env
+    networks:
+      - snowball
     depends_on:
       - postgres_db
