@@ -1,7 +1,7 @@
 from typing import List
 
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, BigInteger
 from src.utils.db import Base, session
 
 
@@ -9,7 +9,7 @@ class Users(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    tg_id: Mapped[int] = mapped_column(nullable=False, unique=True)
+    tg_id: Mapped[int] = mapped_column(BigInteger, nullable=False, unique=True)
     role: Mapped[str] = mapped_column(nullable=False)
     chat: Mapped[str] = mapped_column(nullable=False)
 

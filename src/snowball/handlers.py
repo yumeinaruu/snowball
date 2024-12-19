@@ -75,7 +75,7 @@ async def start_type_chosen(message: types.Message, state: FSMContext):
 @snowball_router.message(Register.choosing_register)
 async def choice_incorrect(message: types.Message):
     await message.answer_sticker(
-        r'CAACAgIAAxkBAAEKu_hnVFXyusZgy9KLwB7A3Z7cDqt1DgACEiAAAmd5uUhgfmY8HebIQDYE'
+        r'CAACAgIAAxkBAAELCzdnZEaG2A4v9w6J6aX_2bEMdvsTVQACkBMAAleWyEmF7_AtYtmTwjYE'
     )
     await message.answer(
         text="Нет такой опции(.\n\n"
@@ -131,12 +131,16 @@ async def choice_incorrect_chat(message: types.Message):
 async def choosing_role(message: types.Message, state: FSMContext):
     await state.update_data({"role": message.text.capitalize()})
     data = await state.get_data()
-    user = Users(tg_id=message.from_user.id, role=data["role"], chat=data["chat"])
-    session.add(user)
-    session.commit()
-    await message.answer(f"{data["role"]} юпиё!")
-    await state.clear()
-    await state.set_data({})
+    try:
+        user = Users(tg_id=message.from_user.id, role=data["role"], chat=data["chat"])
+        session.add(user)
+        session.commit()
+        await message.answer(f"{data["role"]} юпиё!")
+        await state.clear()
+        await state.set_data({})
+    except:
+        session.rollback()
+        await message.answer("ОШИБКА! Пожалуйтесь разработчику")
 
 
 @snowball_router.callback_query(Register.choosing_receiver, UserCallbackFactory.filter())
@@ -154,13 +158,17 @@ async def chat_choose_receiver_without_state(message: types.Message):
 @snowball_router.message(Register.choosing_message)
 async def chat_choosing_message(message: types.Message, state: FSMContext):
     to_user_obj = Users.get_user_by_tg_id((await state.get_data())["to_user"])
-    msg = Messages(text=message.text, from_user=Users.get_user_by_tg_id(message.from_user.id),
-                   to_user=to_user_obj)
-    session.add(msg)
-    session.commit()
-    await message.answer(f"Юпиёёёёё!\nСообщение отправлено участнику {to_user_obj.role} из {to_user_obj.chat}")
-    await state.clear()
-    await state.set_data({})
+    try:
+        msg = Messages(text=message.text, from_user=Users.get_user_by_tg_id(message.from_user.id),
+                       to_user=to_user_obj)
+        session.add(msg)
+        session.commit()
+        await message.answer(f"Юпиёёёёё!\nСообщение отправлено участнику {to_user_obj.role} из {to_user_obj.chat}")
+        await state.clear()
+        await state.set_data({})
+    except:
+        session.rollback()
+        await message.answer("ОШИБКА! Пожалуйтесь разработчику")
 
 
 @snowball_router.callback_query(Register.choosing_receiver, F.data == "prev_page_users")
