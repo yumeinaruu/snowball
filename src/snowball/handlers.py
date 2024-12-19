@@ -75,7 +75,7 @@ async def start_type_chosen(message: types.Message, state: FSMContext):
 @snowball_router.message(Register.choosing_register)
 async def choice_incorrect(message: types.Message):
     await message.answer_sticker(
-        r'CAACAgIAAxkBAAELCzdnZEaG2A4v9w6J6aX_2bEMdvsTVQACkBMAAleWyEmF7_AtYtmTwjYE'
+        r'CAACAgIAAxkBAAELC-lnZGCClLnfZHBryZG75Db5tnrqIwACNxwAArOeKEkiwUFeRnjWfTYE'
     )
     await message.answer(
         text="Нет такой опции(.\n\n"
@@ -118,7 +118,7 @@ async def chat_type_chosen(message: types.Message, state: FSMContext):
 @snowball_router.message(Register.choosing_chat_options)
 async def choice_incorrect_chat(message: types.Message):
     await message.answer_sticker(
-        r'CAACAgIAAxkBAAEKu_hnVFXyusZgy9KLwB7A3Z7cDqt1DgACEiAAAmd5uUhgfmY8HebIQDYE'
+        r'CAACAgIAAxkBAAELC-lnZGCClLnfZHBryZG75Db5tnrqIwACNxwAArOeKEkiwUFeRnjWfTYE'
     )
     await message.answer(
         text="Нет такого чата(.\n\n"
