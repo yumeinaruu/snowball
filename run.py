@@ -21,7 +21,6 @@ async def run_server():
 if __name__ == "__main__":
     if args.create_db:
         from src.utils.db import create_tables
-
         create_tables()
 
     asyncio.run(run_server())
