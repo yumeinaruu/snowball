@@ -1,4 +1,4 @@
-available_type_choices = ['Регистрация', 'Отправка сообщения']
+available_type_choices = ['Реєстрація', 'Надсилання повідомлення']
 available_type_choices_dict = {
     'reg': available_type_choices[0],
     'send': available_type_choices[1],

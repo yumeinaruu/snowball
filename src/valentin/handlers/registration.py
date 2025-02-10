@@ -16,11 +16,11 @@ reg_router = Router()
 @reg_router.message(StateFilter(StateStart.starting), F.text == available_type_choices_dict['reg'])
 async def registration_start_chosen(message: types.Message, state: FSMContext):
     if Users.is_exists(message.from_user.id):
-        await message.answer("Ты уже зареган(")
+        await message.answer("Ти вже зареєстрований")
         return
 
     await message.answer(
-        text="Теперь выбери курс:",
+        text="Тепер вибери курс:",
         reply_markup=make_row_keyboard(available_course_choices)
     )
     await state.set_state(RegisterState.choose_course)
@@ -29,8 +29,8 @@ async def registration_start_chosen(message: types.Message, state: FSMContext):
 @reg_router.message(StateFilter(RegisterState.choose_course), F.text.in_(available_course_choices))
 async def registration_course_chosen(message: types.Message, state: FSMContext):
     await message.answer(
-        text=f"Ты выбрал курс {message.text.lower()}.\n"
-             f"Теперь напиши свое имя",
+        text=f"Ти вибрав курс {message.text.lower()}.\n"
+             f"Тепер напиши своє ім'я",
         reply_markup=ReplyKeyboardRemove()
     )
     await state.update_data({"course": message.text})
@@ -40,8 +40,8 @@ async def registration_course_chosen(message: types.Message, state: FSMContext):
 @reg_router.message(StateFilter(RegisterState.choose_course), F.text.not_in_(available_course_choices))
 async def registration_course_incorrect(message: types.Message):
     await message.answer(
-        text="Нет такого курса(.\n\n"
-             "Выбери один из списка ниже:",
+        text="Немає такого курсу\n\n"
+             "Вибери один зі списку нижче:",
         reply_markup=make_row_keyboard(available_course_choices)
     )
 
@@ -58,4 +58,4 @@ async def registration_choosing_name(message: types.Message, state: FSMContext):
         await state.clear()
     except Exception:
         session.rollback()
-        await message.answer("ОШИБКА! Пожалуйтесь разработчику")
+        await message.answer("ПОМИЛКА! Поскаржтеся розробнику")
