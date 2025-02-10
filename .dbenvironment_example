@@ -1,5 +1,5 @@
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=root
-POSTGRES_DB=snowball_db
-PGHOST=postgres
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=valentin_bot_db
+PGHOST=valentin-bot-db
 PGPORT=5432

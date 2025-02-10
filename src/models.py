@@ -10,8 +10,8 @@ class Users(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     tg_id: Mapped[int] = mapped_column(BigInteger, nullable=False, unique=True)
-    role: Mapped[str] = mapped_column(nullable=False)
-    chat: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(nullable=False)
+    course: Mapped[str] = mapped_column(nullable=False)
 
     sent_messages: Mapped[List["Messages"]] = relationship(
         "Messages", back_populates="from_user", foreign_keys="Messages.from_user_id"
@@ -21,11 +21,19 @@ class Users(Base):
     )
 
     def __repr__(self):
-        return f"User({self.role})"
+        return f"User({self.name})"
 
     @staticmethod
-    def get_user_by_tg_id(tg_id):
+    def is_exists(tg_id):
+        return session.query(Users).filter_by(tg_id=tg_id).count() > 0
+
+    @staticmethod
+    def get_by_tg_id(tg_id):
         return session.query(Users).filter_by(tg_id=tg_id).first()
+
+    @staticmethod
+    def get_by_course(course):
+        return session.query(Users).filter_by(course=course).all()
 
 
 class Messages(Base):

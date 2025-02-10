@@ -1,29 +1,29 @@
 networks:
-  snowball:
-    name: snowball
+  valentin:
+    name: valentin
     external: true
 
 services:
-  postgres_db:
+  valentin-bot-db:
     image: postgres:latest
-    container_name: db_postgres_snowball_bot
+    container_name: valentin-bot-db
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=snowball_bot
+      - POSTGRES_DB=valentin_bot_db
     networks:
-      - snowball
-  bot:
+      - valentin
+  valentin-bot:
     build: .
-    container_name: snowball_bot
+    container_name: valentin-bot
     command: python ./run.py --create_db
     volumes:
       - .:/app
     env_file:
       - .env
     networks:
-      - snowball
+      - valentin
     depends_on:
-      - postgres_db
+      - valentin-bot-db

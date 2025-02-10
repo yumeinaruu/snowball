@@ -1,2 +1,3 @@
-# snowball
-tg bot for flood 17+
+# Valentin
+tg bot for navia
+payment: photo tits
