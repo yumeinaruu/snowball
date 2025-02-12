@@ -30,7 +30,7 @@ async def registration_start_chosen(message: types.Message, state: FSMContext):
 async def registration_course_chosen(message: types.Message, state: FSMContext):
     await message.answer(
         text=f"Ти вибрав курс {message.text.lower()}.\n"
-             f"Тепер напиши своє ім'я",
+             f"Тепер напиши своє Прізвище та імʼя",
         reply_markup=ReplyKeyboardRemove()
     )
     await state.update_data({"course": message.text})
@@ -59,4 +59,4 @@ async def registration_choosing_name(message: types.Message, state: FSMContext):
     except Exception:
         session.rollback()
         await state.clear()
-        await message.answer(f"ПОМИЛКА! Поскаржтеся розробнику! \n\n{e}")
+        await message.answer(f"ПАМИЛКА! Поскаржтеся розробнику! \n\n{e}")
