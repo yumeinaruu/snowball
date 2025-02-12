@@ -21,6 +21,7 @@ var/
 .env
 .dbenvironment
 .venv/
+venv/
 
 .idea
 
