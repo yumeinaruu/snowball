@@ -1,23 +1,26 @@
+from datetime import datetime
 from random import randint
 
 from aiogram import types, F, Router
+from aiogram.enums import ParseMode
 from aiogram.types import ReplyKeyboardRemove
-from aiogram.filters import StateFilter
+from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.models import Users, Messages
+from src.models import User, Message
 from src.utils.db import session
 from src.valentin.fsm import StateStart, SendingMessageState, UserCallbackFactory
-from src.valentin.keyboards import make_row_keyboard
+from src.valentin.keyboards import make_row_keyboard, generate_prev_stop_next_keyboard
 from src.utils.constans import all_predictions
 from .utils import available_course_choices, available_type_choices_dict
+
 messages_router = Router()
 
 
 @messages_router.message(StateFilter(StateStart.starting), F.text == available_type_choices_dict['send'])
 async def sending_message_start(message: types.Message, state: FSMContext):
-    user = Users.get_by_tg_id(message.from_user.id)
+    user = User.get_by_tg_id(message.from_user.id)
     if user:
         await message.answer(
             text="Тепер вибери курс:",
@@ -38,7 +41,7 @@ async def sending_message_course_chosen(message: types.Message, state: FSMContex
     await state.update_data({"course": message.text.capitalize()})
     await state.set_state(SendingMessageState.choose_receiver)
 
-    users = Users.get_by_course(course=(await state.get_data())["course"])
+    users = User.get_by_course(course=(await state.get_data())["course"])
     msg = "Людины:"
     builder = InlineKeyboardBuilder()
     for user in users:
@@ -51,7 +54,8 @@ async def sending_message_course_chosen(message: types.Message, state: FSMContex
 
 
 @messages_router.callback_query(StateFilter(SendingMessageState.choose_receiver), UserCallbackFactory.filter())
-async def sending_message_receiver_chosen(callback: types.CallbackQuery, callback_data: UserCallbackFactory, state: FSMContext):
+async def sending_message_receiver_chosen(callback: types.CallbackQuery, callback_data: UserCallbackFactory,
+                                          state: FSMContext):
     await callback.message.answer("Тепер напиши валентинку")
     await state.update_data({"to_user": callback_data.telegram_id})
     await state.set_state(SendingMessageState.choose_message)
@@ -59,22 +63,70 @@ async def sending_message_receiver_chosen(callback: types.CallbackQuery, callbac
 
 @messages_router.message(StateFilter(SendingMessageState.choose_message))
 async def sending_message_message_chosen(message: types.Message, state: FSMContext):
-    to_user_obj = Users.get_by_tg_id((await state.get_data())["to_user"])
+    to_user_obj = User.get_by_tg_id((await state.get_data())["to_user"])
     try:
-        msg = Messages(text=message.text,
-                       from_user=Users.get_by_tg_id(message.from_user.id),
-                       to_user=to_user_obj)
+        msg = Message(text=message.text,
+                      from_user=User.get_by_tg_id(message.from_user.id),
+                      to_user=to_user_obj)
         session.add(msg)
         session.commit()
-        await message.answer(f"Вашу валентинку прийнято. Рівно о 12:00 14 лютого людина її отримає! 💞 {to_user_obj.name} з {to_user_obj.course} групи.\nА поки ви чекаєте, отримайте від нас невелике побажання: ")
-        await message.answer(all_predictions[randint(0, len(all_predictions)-1)])
+        await message.answer(
+            f"Вашу валентинку прийнято. Рівно о 12:00 14 лютого людина її отримає! 💞 <a href=tg://user?id={to_user_obj.id}>{to_user_obj.name}</a> з {to_user_obj.course} групи.\nА поки ви чекаєте, отримайте від нас невелике побажання: ",
+            parse_mode=ParseMode.HTML)
+        await message.answer(all_predictions[randint(0, len(all_predictions) - 1)])
         await state.clear()
         await state.set_data({})
-    except Exception:
+    except Exception as e:
         session.rollback()
-        await message.answer("ПОМИЛКА! Поскаржтеся розробнику")
+        await state.clear()
+        await message.answer(f"ПОМИЛКА! Поскаржтеся розробнику! \n\n{e}")
 
-# TODO
-# Когда пришло время получать валентинки:
-# (Цифра) людей відправили вам валентинки! Бажаєте їх переглянути? 💞
-# (человек нажимает палец вверх на панели, и ему приходит валентинка. Если их несколько, то по принципу как в дв, после прочтения снова нажимает палец вверх и присылается следующая)
+
+@messages_router.message(StateFilter(None), Command("valentin"))
+async def watch_valentin(message: types.Message, state: FSMContext):
+    if datetime.now() <= datetime(2025, 2, 14, 14, 00, 00):
+        messages_count = Message.get_count_messages_to_user(User.get_by_tg_id(message.from_user.id).id)
+        builder = InlineKeyboardBuilder()
+        builder.row(types.InlineKeyboardButton(
+            text="Переглянути валентинку",
+            callback_data="valentinmessages_start"),
+        )
+        if messages_count > 0:
+            await message.answer(f"{messages_count} людей відправили вам валентинки! Бажаєте їх переглянути? 💞",
+                                 reply_markup=builder.as_markup())
+        else:
+            await message.answer(
+                f"Вам не надіслали валентинку(\nТримайте натомість передбачення від нас: {all_predictions[randint(0, len(all_predictions) - 1)]}")
+    else:
+        await message.answer("Час ще не настав...")
+
+
+id_messages = {}
+
+
+@messages_router.callback_query(F.data.startswith("valentinmessages_"))
+async def callbacks_num(callback: types.CallbackQuery):
+    message_id = id_messages.get(callback.from_user.id, 0)
+    action = callback.data.split("_")[1]
+    messages = Message.get_messages_to_user(User.get_by_tg_id(callback.from_user.id).id)
+
+    if messages:
+        if action == "start":
+            id_messages[callback.from_user.id] = 0
+            keyboard = generate_prev_stop_next_keyboard(prev=False)
+            await callback.message.edit_text(messages[0].text, reply_markup=keyboard.as_markup())
+        if action == "prev":
+            id_messages[callback.from_user.id] = message_id - 1 if message_id > 0 else 0
+            keyboard = generate_prev_stop_next_keyboard(prev=True if message_id > 0 else False)
+            await callback.message.edit_text(messages[message_id].text, reply_markup=keyboard.as_markup())
+        elif action == "next":
+            count_messages = messages.count()
+            id_messages[callback.from_user.id] = message_id + 1 if message_id < count_messages - 1 else count_messages - 1
+            keyboard = generate_prev_stop_next_keyboard(next=True if message_id < count_messages - 1 else False)
+            await callback.message.edit_text(messages[message_id].text, reply_markup=keyboard.as_markup())
+        elif action == "end":
+            id_messages.pop(callback.from_user.id)
+            await callback.message.edit_text(f"Закінчилися валентинки")
+    else:
+        await callback.message.edit_text(
+            f"Вам не прислали валентинку(\nДержите в замен предсказание от нас: {all_predictions[randint(0, len(all_predictions) - 1)]}")

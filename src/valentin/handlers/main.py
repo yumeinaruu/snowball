@@ -4,7 +4,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
-from src.models import Users
+from src.models import User
 from src.valentin.keyboards import make_row_keyboard
 from src.valentin.fsm import StateStart
 from .utils import available_type_choices, available_type_choices_dict
@@ -32,7 +32,7 @@ async def menu(message: types.Message, state: FSMContext):
 
 @main_router.message(Command("me"))
 async def me(message: types.Message, state: FSMContext):
-    user = Users.get_by_tg_id(tg_id=message.from_user.id)
+    user = User.get_by_tg_id(tg_id=message.from_user.id)
     await state.clear()
     if user:
         await message.answer(f"Ти {user.name}\nТвій курс: {user.course}")
@@ -52,5 +52,6 @@ async def choice_incorrect(message: types.Message):
 @main_router.message()
 async def all_messages(message: types.Message, state: FSMContext):
     logging.info(f"{message.from_user.first_name}(@{message.from_user.username}): {message.text}. State: {await state.get_state()}")
-    if await state.get_state() is None:
-        await message.answer("Напишіть /menu для виклику меню")
+    if await state.get_state() is not None:
+        await state.clear()
+    await message.answer("Напишіть /menu для виклику меню")

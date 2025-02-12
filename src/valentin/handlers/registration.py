@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 
-from src.models import Users
+from src.models import User
 from src.utils.db import session
 from src.valentin.fsm import RegisterState, StateStart
 from src.valentin.keyboards import make_row_keyboard
@@ -15,7 +15,7 @@ reg_router = Router()
 
 @reg_router.message(StateFilter(StateStart.starting), F.text == available_type_choices_dict['reg'])
 async def registration_start_chosen(message: types.Message, state: FSMContext):
-    if Users.is_exists(message.from_user.id):
+    if User.is_exists(message.from_user.id):
         await message.answer("Ти вже зареєстрований")
         return
 
@@ -51,11 +51,12 @@ async def registration_choosing_name(message: types.Message, state: FSMContext):
     await state.update_data({"name": message.text.capitalize()})
     data = await state.get_data()
     try:
-        user = Users(tg_id=message.from_user.id, name=data["name"], course=data["course"])
+        user = User(tg_id=message.from_user.id, name=data["name"], course=data["course"])
         session.add(user)
         session.commit()
         await message.answer(f"{data["name"]}!")
         await state.clear()
     except Exception:
         session.rollback()
-        await message.answer("ПОМИЛКА! Поскаржтеся розробнику")
+        await state.clear()
+        await message.answer(f"ПОМИЛКА! Поскаржтеся розробнику! \n\n{e}")

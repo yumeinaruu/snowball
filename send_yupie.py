@@ -3,11 +3,11 @@ from aiogram import Bot
 
 from src.settings import settings
 from src.utils.db import session
-from src.models import Messages
+from src.models import Message
 
 
 async def main():
-    messages = session.query(Messages).all()
+    messages = session.query(Message).all()
     for message in messages:
         msg = f"От {message.from_user.role} из {message.from_user.chat}\n" + message.text
         while True:
