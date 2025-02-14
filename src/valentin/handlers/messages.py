@@ -81,7 +81,7 @@ async def sending_message_message_chosen(message: types.Message, state: FSMConte
 
 @messages_router.message(StateFilter(None), Command("valentin"))
 async def watch_valentin(message: types.Message, state: FSMContext):
-    if datetime.now() >= datetime(2025, 2, 14, 14, 00, 00):
+    if datetime.now() >= datetime(2025, 2, 14, 12, 00, 00):
         messages_count = Message.get_count_messages_to_user(User.get_by_tg_id(message.from_user.id).id)
         builder = InlineKeyboardBuilder()
         builder.row(types.InlineKeyboardButton(
